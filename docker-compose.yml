@@ -1,0 +1,18 @@
+version: '2.1'
+
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: auth.Dockerfile
+    image: auth
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    links:
+      - mongo:mongo
+  mongo:
+    image: mongo
+    volumes:
+      - ./data/:/data

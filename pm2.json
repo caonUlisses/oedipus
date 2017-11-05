@@ -1,0 +1,9 @@
+{
+    "apps": [{
+      "name": "auth",
+      "script": "./bin/www",
+      "env": {
+        "production": true
+      }
+    }]
+  }
