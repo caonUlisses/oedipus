@@ -60,6 +60,23 @@ UserSchema.methods.generateAuthToken = function(access) {
     })
 }
 
+UserSchema.statics.returnByToken = function (token) {
+    let User = this
+    let decoded
+  
+    try {
+      decoded = jwt.verify(token, process.env.APP_KEY)
+    } catch (e) {
+      return Promise.reject()
+    }
+  
+    return User.findOne({
+      '_id': decoded._id,
+      'tokens.token': token
+    })
+}
+  
+
 UserSchema.statics.findByToken = function(token) {
     let User    = this
     let decoded = undefined
@@ -73,7 +90,6 @@ UserSchema.statics.findByToken = function(token) {
     return User.findOne({
         '_id'          : decoded._id,
         'tokens.token' : token,
-        // 'tokens.access': 'auth'
     })
 }
 

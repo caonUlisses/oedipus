@@ -30,10 +30,10 @@ app.get('/users/', authenticate, (req, res) => {
 app.post('/users/', (req, res) => {
   let hash    = Math.random().toString(36).substring(7)
   let picture = req.files ? req.files.picture : null
-  
+
   let pictureName = picture ? hash + picture.name : "default.png"
-  let picturePath = `./files/${pictureName}` 
-   
+  let picturePath = `./files/${pictureName}`
+
   if(picture) {
       picture.mv(`./files/${pictureName}`, (err) => {
           if(err) {
@@ -41,14 +41,14 @@ app.post('/users/', (req, res) => {
             }
           })
   }
-        
+
   let body     = _.pick(req.body, ['name','email', 'password'])
   body.picture = picturePath
 
   let access   = req.body.access ? req.body.access : null
   let user     = new User(body)
-  
-  
+
+
   user.save().then(() => {
     if(access) {
         return user.generateAuthToken(access)
@@ -64,10 +64,21 @@ app.post('/users/', (req, res) => {
 
 app.get('users/:id', (req, res) => {
   let id = req.params.id
+
   User.findById(id).then((user) => {
     res.status(200).send({user})
   }).catch((e) => {
     res.status(400).send(e)
+  })
+})
+
+app.get('/auth', (req, res) => {
+  let token = req.header('x-auth')
+
+  User.returnByToken(token).then((user) => {
+    res.status(200).send(user)
+  }).catch((e) => {
+    res.status(401).send('Não foi possível localizar o usuário')
   })
 })
 
