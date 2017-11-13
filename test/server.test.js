@@ -17,7 +17,6 @@ let invalidUser = {
     password: '12345678'
 }
 
-
 describe('/', () => {
     it('should return a 404 when a unhandled GET occurs', (done) => {
         chai.request(app)
