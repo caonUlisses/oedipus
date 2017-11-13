@@ -100,10 +100,20 @@ app.patch('/users/:_id', authenticate, (req, res) => {
   })
 })
 
-app.get('users/:id', (req, res) => {
+app.get('/users/:id', authenticate, (req, res) => {
   let id = req.params.id
 
   User.findById(id).then((user) => {
+    res.status(200).send({user})
+  }).catch((e) => {
+    res.status(400).send(e)
+  })
+})
+
+app.delete('/users/:id', authenticate, (req, res) => {
+  let id = req.params.id
+
+  User.findByIdAndRemove(id).then((user) => {
     res.status(200).send({user})
   }).catch((e) => {
     res.status(400).send(e)
@@ -121,7 +131,7 @@ app.get('/auth', (req, res) => {
 })
 
 app.use((req, res, next) => {
-  let err        = new Error('Not Found')
+  let err        = new Error('Página não encontrada')
       err.status = 404;
   next(err)
 })
