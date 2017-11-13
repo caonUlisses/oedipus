@@ -62,6 +62,44 @@ app.post('/users/', (req, res) => {
   })
 })
 
+app.patch('/users/:_id', authenticate, (req, res) => {
+  let _id     = req.params._id
+  let hash    = Math.random().toString(36).substring(7)
+  let picture = req.files ? req.files.picture : null
+  
+  let pictureName = picture ? hash + picture.name : "default.png"
+  let picturePath = `./files/${pictureName}`
+  
+  if(picture) {
+    picture.mv(`./files/${pictureName}`, (err) => {
+      if(err) {
+        return res.send(err)
+      }
+    })
+  }
+  
+  let body     = _.pick(req.body, ['name','email', 'password'])
+  body.picture = picturePath
+  
+  let access      = req.body.access ? req.body.access : null
+  
+  User.findOneAndUpdate({_id}, { $set: body }, { new: true }).then((user) => {
+    let token     = req.token
+    let userToken = user.tokens[0].token
+    if(!user) {
+      return res.status(404).send({message: 'Houve um problema localizando o Usuário'})
+    }
+
+    if(userToken !== token ) {
+      return res.status(401).send({message: 'Você não pode alterar este usuário', token, userToken})
+    }
+    
+    res.send({user})
+  }).catch((e) => {
+    res.status(400).send({message: 'Houve um problema na alteração do Usuário'})
+  })
+})
+
 app.get('users/:id', (req, res) => {
   let id = req.params.id
 
