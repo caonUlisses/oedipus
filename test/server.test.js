@@ -7,7 +7,7 @@ chai.use(chaiHttp)
 
 let validUser = {
     name    : 'Testing',
-    email   : 'seeder@test.com',
+    email   : 'seeder@seeder.com',
     password: '12345678'
 }
 
@@ -65,7 +65,7 @@ describe('/users', () => {
     it('should get the users list', (done) => {
         chai.request(app)
         .get('/users')
-        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWRlMzUzZmZiZTUwMGU4MDliZmMiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTY4NH0.ESi0LCqs2Rgir7xIBI2O_KolRcvTELsEWwRMmX9dPTE')
+        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWVhMjc3YWQxOTUzOTJhNTc0ZGEiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTg3NH0.Q5gSjqw2hwCuh0mV6NOWV-7ZBq_MCEO0-6LEY-x3__s')
         .end((err, res) => {
             res.should.have.status(200)
             done()
@@ -74,8 +74,8 @@ describe('/users', () => {
 
     it('should get a specific user', (done) => {
         chai.request(app)
-        .get('/users/5a099de353ffbe500e809bfc')
-        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWRlMzUzZmZiZTUwMGU4MDliZmMiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTY4NH0.ESi0LCqs2Rgir7xIBI2O_KolRcvTELsEWwRMmX9dPTE')
+        .get('/users/5a099ea277ad195392a574da')
+        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWVhMjc3YWQxOTUzOTJhNTc0ZGEiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTg3NH0.Q5gSjqw2hwCuh0mV6NOWV-7ZBq_MCEO0-6LEY-x3__s')
         .end((err, res) => {
             res.should.have.status(200)
             res.body.user.should.have.property('email')
@@ -86,7 +86,7 @@ describe('/users', () => {
     it('should return the authenticated user', (done) => {
         chai.request(app)
         .get('/auth')
-        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWRlMzUzZmZiZTUwMGU4MDliZmMiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTY4NH0.ESi0LCqs2Rgir7xIBI2O_KolRcvTELsEWwRMmX9dPTE')
+        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWVhMjc3YWQxOTUzOTJhNTc0ZGEiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTg3NH0.Q5gSjqw2hwCuh0mV6NOWV-7ZBq_MCEO0-6LEY-x3__s')
         .end((err, res) => {
             res.should.have.status(200)
             res.body.should.have.property('email')
@@ -97,8 +97,8 @@ describe('/users', () => {
 
     it('should delete an user', (done) => {
         chai.request(app)
-        .delete('/users/5a099de353ffbe500e809bfc')
-        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWRlMzUzZmZiZTUwMGU4MDliZmMiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTY4NH0.ESi0LCqs2Rgir7xIBI2O_KolRcvTELsEWwRMmX9dPTE')
+        .delete('/users/5a099ea277ad195392a574da')
+        .set('x-auth', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTA5OWVhMjc3YWQxOTUzOTJhNTc0ZGEiLCJhY2Nlc3MiOiJhZG1pbiIsImlhdCI6MTUxMDU3OTg3NH0.Q5gSjqw2hwCuh0mV6NOWV-7ZBq_MCEO0-6LEY-x3__s')
         .end((err, res) => {
             res.should.have.status(200)
             res.body.user.should.have.property('email')
