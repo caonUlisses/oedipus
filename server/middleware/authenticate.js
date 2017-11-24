@@ -5,14 +5,14 @@ const authenticate = async (req, res, next) => {
     const user  = await User.findByToken(token)
     try {
       if (!user) {
-        Promise.reject()
+        throw new error({message: 'Houve um erro na requisição'})
       }
   
       req.user  = user
       req.token = token
       next()
     } catch(e) {
-      res.status(401).send()
+      res.status(401).send({message: 'Usuário não encontrado'})
     }
   }
 
