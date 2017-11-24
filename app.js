@@ -120,28 +120,29 @@ app.get('/users/:id', authenticate, async (req, res) => {
 })
 
 app.delete('/users/:id', authenticate, (req, res) => {
-  let id = req.params.id
-
-  User.findByIdAndRemove(id).then((user) => {
+  const id = req.params.id
+  try {
+    const user = await User.findByIdAndRemove(id)
     res.status(200).send({user})
-  }).catch((e) => {
+  } catch(e) {
     res.status(400).send(e)
-  })
+  }
 })
 
-app.get('/auth', (req, res) => {
-  let token = req.header('x-auth')
+app.get('/auth', async (req, res) => {
+  const token = req.header('x-auth')
 
-  User.returnByToken(token).then((user) => {
+  try {
+    const user = await User.returnByToken(token)
     res.status(200).send(user)
-  }).catch((e) => {
+  } catch(e) {
     res.status(401).send('Não foi possível localizar o usuário')
-  })
+  }
 })
 
 app.use((req, res, next) => {
-  let err        = new Error('Página não encontrada')
-      err.status = 404;
+  const err        = new Error('Página não encontrada')
+  err.status = 404;
   next(err)
 })
 
