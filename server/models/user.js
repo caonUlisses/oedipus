@@ -77,20 +77,21 @@ UserSchema.statics.returnByToken = function (token) {
 }
   
 
-UserSchema.statics.findByToken = function(token) {
-    let User    = this
-    let decoded = undefined
-
-    try {
-        decoded = jwt.verify(token, process.env.APP_KEY)
-    } catch (e) {
-        return Promise.reject()
-    }
-
-    return User.findOne({
+UserSchema.statics.findByToken = async function(token) {
+    const User    = this
+    const decoded = await jwt.verify(token, process.env.APP_KEY)
+    const user    = User.findOne({
         '_id'          : decoded._id,
         'tokens.token' : token,
     })
+
+    try {
+        return user
+    }
+    catch(e) {
+        return e
+    }
+
 }
 
 UserSchema.statics.findByCredentials = function(email, password) {

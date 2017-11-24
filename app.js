@@ -19,12 +19,17 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(fileUpload())
 app.use(logger('dev'))
 
-app.get('/users/', authenticate, (req, res) => {
-  User.find().then((users) => {
-    return res.status(200).send({users})
-  }).catch((e) => {
-    return res.status(400).send(e)
-  })
+app.get('/users/', authenticate, async (req, res) => {
+  const users = await User.find()
+  try {
+
+    if(!users) {
+      throw new error({message: 'Houve um erro na página'})
+    }
+    res.status(200).send(users)
+  } catch(error) {
+    res.status(400).send({message: "Houve um erro", error})
+  }
 })
 
 app.post('/users/', (req, res) => {
@@ -100,14 +105,18 @@ app.patch('/users/:_id', authenticate, (req, res) => {
   })
 })
 
-app.get('/users/:id', authenticate, (req, res) => {
-  let id = req.params.id
-
-  User.findById(id).then((user) => {
-    res.status(200).send({user})
-  }).catch((e) => {
+app.get('/users/:id', authenticate, async (req, res) => {
+  const id   = req.params.id
+  
+  try {
+    const user = await User.findById(id)
+    if(!user) {
+      res.status(400).send({message: 'Não deu certo'})
+    }
+    res.status(200).send(user)
+  } catch(error) {
     res.status(400).send(e)
-  })
+  }
 })
 
 app.delete('/users/:id', authenticate, (req, res) => {
