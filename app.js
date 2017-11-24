@@ -20,8 +20,8 @@ app.use(fileUpload())
 app.use(logger('dev'))
 
 app.get('/users/', authenticate, async (req, res) => {
-  const users = await User.find()
   try {
+    const users = await User.find()
 
     if(!users) {
       throw new error({message: 'Houve um erro na página'})
@@ -119,7 +119,7 @@ app.get('/users/:id', authenticate, async (req, res) => {
   }
 })
 
-app.delete('/users/:id', authenticate, (req, res) => {
+app.delete('/users/:id', authenticate, async (req, res) => {
   const id = req.params.id
   try {
     const user = await User.findByIdAndRemove(id)
