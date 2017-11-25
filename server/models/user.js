@@ -75,7 +75,6 @@ UserSchema.statics.returnByToken = function (token) {
       'tokens.token': token
     })
 }
-  
 
 UserSchema.statics.findByToken = async function(token) {
     const User    = this

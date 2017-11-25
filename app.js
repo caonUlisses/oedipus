@@ -1,18 +1,19 @@
 require('dotenv').config()
 
-const _            = require('lodash')
-const path         = require('path')
-const logger       = require('morgan')
-const express      = require('express')
-const bodyParser   = require('body-parser')
-const fileUpload   = require('express-fileupload')
+const _          = require('lodash')
+const path       = require('path')
+const logger     = require('morgan')
+const express    = require('express')
+const bodyParser = require('body-parser')
+const fileUpload = require('express-fileupload')
 
 const {User}         = require('./server/models/user')
 const {authenticate} = require('./server/middleware/authenticate')
 const {mongoose}     = require('./server/db/mongoose')
 const {ObjectId}     = require('mongodb')
+const {picture}      = require('./server/utils/picture')
 
-let app = express()
+const app = express()
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -32,39 +33,19 @@ app.get('/users/', authenticate, async (req, res) => {
   }
 })
 
-app.post('/users/', (req, res) => {
-  let hash    = Math.random().toString(36).substring(7)
-  let picture = req.files ? req.files.picture : null
+app.post('/users/', async (req, res) => {
+  try{
+    let   body   = _.pick(req.body, ['name','email', 'password'])
+    body.picture = picture.preparePicture(req)
+    let   access = req.body.access ? req.body.access : 'admin'
+    let   user   = await new User(body)
+    await user.save()
+    const token  = await user.generateAuthToken(access)
 
-  let pictureName = picture ? hash + picture.name : "default.png"
-  let picturePath = `./files/${pictureName}`
-
-  if(picture) {
-      picture.mv(`./files/${pictureName}`, (err) => {
-          if(err) {
-              return res.send(err)
-            }
-          })
-  }
-
-  let body     = _.pick(req.body, ['name','email', 'password'])
-  body.picture = picturePath
-
-  let access   = req.body.access ? req.body.access : null
-  let user     = new User(body)
-
-
-  user.save().then(() => {
-    if(access) {
-        return user.generateAuthToken(access)
-      } else{
-        return user.generateAuthToken('admin')
-    }
-  }).then((token) => {
     res.header('x-auth', token).status(200).send({message: "Usuário criado com sucesso"})
-  }).catch((e) => {
-    res.status(400).send(e)
-  })
+  } catch (error) {
+    res.status(400).send({message: "Houve um erro", error})
+  }
 })
 
 app.patch('/users/:_id', authenticate, (req, res) => {
