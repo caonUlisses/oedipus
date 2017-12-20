@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test" : "nyc --reporter=text mocha",
+    "test": "nyc --reporter=text mocha",
     "start": "pm2 start ./bin/www",
     "watch": "nodemon ./bin/www"
   },
