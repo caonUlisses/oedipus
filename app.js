@@ -102,6 +102,17 @@ app.get('/auth', async (req, res) => {
   }
 })
 
+app.post('/login', async (req, res) => {
+  const { email, password } = req.params
+
+  try {
+    const user = await User.findByCredentials(email, password)
+    res.status(200).send(user)
+  } catch (e) {
+    res.status(401).send('Usuário ou senhas incorretos')
+  }
+})
+
 app.use((req, res, next) => {
   const err = new Error('Página não encontrada')
   err.status = 404
