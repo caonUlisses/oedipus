@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const _ = require('lodash')
+const cors = require('cors')
 const path = require('path')
 const logger = require('morgan')
 const express = require('express')
@@ -15,6 +16,7 @@ const { picture } = require('./server/utils/picture')
 
 const app = express()
 
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(fileUpload())
@@ -77,7 +79,7 @@ app.get('/users/:id', authenticate, async (req, res) => {
     }
     res.status(200).send(user)
   } catch (error) {
-    res.status(400).send(e)
+    res.status(400).send('Ocorreu um erro')
   }
 })
 
@@ -103,13 +105,13 @@ app.get('/auth', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-  const { email, password } = req.params
+  const { email, password } = req.body
 
   try {
     const user = await User.findByCredentials(email, password)
-    res.status(200).send(user)
+    res.status(200).send({user})
   } catch (e) {
-    res.status(401).send('Usuário ou senhas incorretos')
+    res.status(401).send('Usuário ou senhas incorretos', e)
   }
 })
 

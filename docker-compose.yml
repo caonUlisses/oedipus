@@ -10,9 +10,12 @@ services:
       NODE_ENV: production
     ports:
       - 3000:3000
-    links:
-      - mongo:mongo
   mongo:
+    build:
+      context: .
+      dockerfile: mongo.Dockerfile
     image: mongo
+    ports:
+      - 27017:27017
     volumes:
       - ./data/:/data
