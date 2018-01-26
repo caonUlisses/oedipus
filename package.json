@@ -1,7 +1,8 @@
 {
-  "name": "auth",
-  "version": "0.0.0",
+  "name": "oedipus",
+  "version": "0.0.2",
   "private": true,
+  "main": "oedipus.js",
   "scripts": {
     "test": "nyc --reporter=text mocha",
     "start": "pm2 start ./bin/www",
