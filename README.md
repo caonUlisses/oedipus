@@ -4,9 +4,11 @@ Oedipus is an auth service solution that works as a docker container for authent
 
 ## How to use the docker version?
 
-Clone the repo, cd in, run:
+Clone the repo, cd in, and run `docker-compose build`:
 
 ```
+git clone https://github.com/caonUlisses/oedipus
+cd oedipus
 docker-compose build
 ```
 
