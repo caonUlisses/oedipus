@@ -2,6 +2,7 @@
   "name": "oedipus",
   "version": "0.0.2",
   "private": true,
+  "license": "mit",
   "main": "oedipus.js",
   "scripts": {
     "test": "nyc --reporter=text mocha",
