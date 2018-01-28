@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose')
 const validator = require('validator')
 
+const key = '$2y$10$hqaELBb/CTd7fwUwduC18uqC4G0Iw.T3IGM3c21HGKMRFHNnRTQ7m'
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -52,7 +54,7 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = async function (access) {
   try {
     const user = this
-    const token = await jwt.sing({_id: user._id.toHexString(), access}, process.env.APP_KEY).toString()
+    const token = await jwt.sing({_id: user._id.toHexString(), access}, key).toString()
     user.tokens.push({access, token})
     await user.save()
 
@@ -65,19 +67,19 @@ UserSchema.methods.generateAuthToken = async function (access) {
 UserSchema.statics.returnByToken = async function (token) {
   try {
     const User = this
-    const decoded = await jwt.verify(token, process.env.APP_KEY)
+    const decoded = await jwt.verify(token, key)
     const user = await User.findOne({ '_id': decoded._id, 'tokens.token': token })
 
     return user
-  } catch (e) {
-    return { err: 'Ocorreu um erro ao buscar o usuário', e }
+  } catch (error) {
+    return { err: 'Ocorreu um erro ao buscar o usuário', error }
   }
 }
 
 UserSchema.statics.findByToken = async function (token) {
   try {
     const User = this
-    const decoded = await jwt.verify(token, process.env.APP_KEY)
+    const decoded = await jwt.verify(token, key)
     const user = User.findOne({
       '_id': decoded._id,
       'tokens.token': token

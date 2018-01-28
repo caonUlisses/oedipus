@@ -8,7 +8,7 @@ const { authenticate } = require('./../middleware/authenticate.js')
 const { picture } = require('./../utils/picture.js')
 const {User} = require('./../models/user.js')
 
-oedipus.get('/users/', authenticate, async (req, res) => {
+oedipus.get('/', authenticate, async (req, res) => {
   try {
     const users = await User.find()
 
@@ -17,11 +17,11 @@ oedipus.get('/users/', authenticate, async (req, res) => {
     }
     res.status(200).send(users)
   } catch (error) {
-    res.status(400).send({ message: 'Houve um erro', error })
+    res.status(400).send({ message: 'Não foi possível obter a lista de usuários', error })
   }
 })
 
-oedipus.post('/users/', async (req, res) => {
+oedipus.post('/', async (req, res) => {
   try {
     let body = _.pick(req.body, ['name', 'email', 'password'])
     body.picture = picture.preparePicture(req)
@@ -32,11 +32,11 @@ oedipus.post('/users/', async (req, res) => {
 
     res.header('x-auth', token).status(200).send({ message: 'Usuário criado com sucesso' })
   } catch (error) {
-    res.status(400).send({ message: 'Houve um erro', error })
+    res.status(400).send({ message: 'Houve um erro na criação do usuário', error })
   }
 })
 
-oedipus.patch('/users/:_id', authenticate, async (req, res) => {
+oedipus.patch('/:_id', authenticate, async (req, res) => {
   try {
     const _id = req.params._id
     const body = _.pick(req.body, ['name', 'email', 'password'])
@@ -50,58 +50,67 @@ oedipus.patch('/users/:_id', authenticate, async (req, res) => {
     }
 
     res.send({ user })
-  } catch (e) {
-    res.status(400).send({ message: 'Houve um problema na alteração do Usuário' })
+  } catch (error) {
+    res.status(400).send({ message: 'Houve um problema na alteração do Usuário', error })
   }
 })
 
-oedipus.get('/users/:id', authenticate, async (req, res) => {
-  const id = req.params.id
-
+oedipus.get('/logout', async (req, res) => {
   try {
+    const token = req.headers['x-auth']
+    const user = await User.findByToken(token)
+    user.tokens = []
+    await user.save()
+    res.status(200).send({ message: 'Inicie uma sessão' })
+  } catch (error) {
+    res.status(400).send({ message: 'Erro ao sair do sistema', error })
+  }
+})
+
+oedipus.get('/token', async (req, res) => {
+  try {
+    const token = req.header('x-auth')
+    const user = await User.returnByToken(token)
+    res.status(200).send(user)
+  } catch (error) {
+    res.status(401).send({ message: 'Não foi possível localizar o usuário', error })
+  }
+})
+
+oedipus.get('/:_id', authenticate, async (req, res) => {
+  try {
+    const id = req.params._id
     const user = await User.findById(id)
     if (!user) {
-      res.status(400).send({ message: 'Não deu certo' })
+      res.status(400).send({ message: 'Usuário inexistente' })
     }
     res.status(200).send(user)
   } catch (error) {
-    res.status(400).send('Ocorreu um erro')
+    res.status(400).send({ message: 'O usuário não foi localizado', error })
   }
 })
 
-oedipus.delete('/users/:id', authenticate, async (req, res) => {
-  const id = req.params.id
+oedipus.delete('/:_id', authenticate, async (req, res) => {
   try {
+    const id = req.params._id
     const user = await User.findByIdAndRemove(id)
     res.status(200).send({ user })
-  } catch (e) {
-    res.status(400).send(e)
-  }
-})
-
-oedipus.get('/auth', async (req, res) => {
-  const token = req.header('x-auth')
-
-  try {
-    const user = await User.returnByToken(token)
-    res.status(200).send(user)
-  } catch (e) {
-    res.status(401).send('Não foi possível localizar o usuário')
+  } catch (error) {
+    res.status(400).send({ message: 'Erro ao remover usuário', error })
   }
 })
 
 oedipus.post('/login', async (req, res) => {
-  const { email, password } = req.body
-
   try {
+    const { email, password } = req.body
     const user = await User.findByCredentials(email, password)
     const payload = {
       user: user,
       tokens: user.tokens
     }
     res.status(200).send(payload)
-  } catch (e) {
-    res.status(401).send('Usuário ou senhas incorretos', e)
+  } catch (error) {
+    res.status(401).send({ message: 'Usuário ou senha incorreto', error })
   }
 })
 
