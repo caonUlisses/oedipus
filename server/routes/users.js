@@ -36,25 +36,6 @@ oedipus.post('/', async (req, res) => {
   }
 })
 
-oedipus.patch('/:_id', authenticate, async (req, res) => {
-  try {
-    const _id = req.params._id
-    const body = _.pick(req.body, ['name', 'email', 'password'])
-    body.picture = picture.preparePicture(req)
-    const user = await User.findOneAndUpdate({ _id }, { $set: body }, { new: true })
-    const token = req.token
-    const userToken = user.tokens[0].token
-
-    if (userToken !== token) {
-      return res.status(401).send({ message: 'Você não pode alterar este usuário' })
-    }
-
-    res.send({ user })
-  } catch (error) {
-    res.status(400).send({ message: 'Houve um problema na alteração do Usuário', error })
-  }
-})
-
 oedipus.get('/logout', async (req, res) => {
   try {
     const token = req.headers['x-auth']
@@ -87,6 +68,25 @@ oedipus.get('/:_id', authenticate, async (req, res) => {
     res.status(200).send(user)
   } catch (error) {
     res.status(400).send({ message: 'O usuário não foi localizado', error })
+  }
+})
+
+oedipus.patch('/:_id', authenticate, async (req, res) => {
+  try {
+    const _id = req.params._id
+    const body = _.pick(req.body, ['name', 'email', 'password'])
+    body.picture = picture.preparePicture(req)
+    const user = await User.findOneAndUpdate({ _id }, { $set: body }, { new: true })
+    const token = req.token
+    const userToken = user.tokens[0].token
+
+    if (userToken !== token) {
+      return res.status(401).send({ message: 'Você não pode alterar este usuário' })
+    }
+
+    res.send({ user })
+  } catch (error) {
+    res.status(400).send({ message: 'Houve um problema na alteração do Usuário', error })
   }
 })
 
