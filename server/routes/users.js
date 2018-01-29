@@ -23,13 +23,12 @@ oedipus.get('/', authenticate, async (req, res) => {
 
 oedipus.post('/', async (req, res) => {
   try {
-    let body = _.pick(req.body, ['name', 'email', 'password'])
+    let body = _.pick(req.body, ['name', 'email', 'password', 'access'])
+    console.log(body.access)
     body.picture = picture.preparePicture(req)
-    let access = req.body.access ? req.body.access : 'admin'
-    let user = await new User(body)
+    const user = await new User(body)
     await user.save()
-    const token = await user.generateAuthToken(access)
-
+    const token = await user.generateAuthToken(body.access)
     res.header('x-auth', token).status(200).send({ message: 'Usuário criado com sucesso' })
   } catch (error) {
     res.status(400).send({ message: 'Houve um erro na criação do usuário', error })
@@ -40,8 +39,7 @@ oedipus.get('/logout', async (req, res) => {
   try {
     const token = req.headers['x-auth']
     const user = await User.findByToken(token)
-    user.tokens = []
-    await user.save()
+    user.removeToken(token)
     res.status(200).send({ message: 'Inicie uma sessão' })
   } catch (error) {
     res.status(400).send({ message: 'Erro ao sair do sistema', error })

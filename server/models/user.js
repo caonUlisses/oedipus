@@ -2,9 +2,12 @@ const _ = require('lodash')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose')
+const ObjectID = require('mongodb').ObjectID
 const validator = require('validator')
+const config = require('./../../config/master.js')
 
-const key = '$2y$10$hqaELBb/CTd7fwUwduC18uqC4G0Iw.T3IGM3c21HGKMRFHNnRTQ7m'
+const key = config.app.key
+const serverId = new ObjectID()
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -33,6 +36,17 @@ const UserSchema = new mongoose.Schema({
     minlength: 6
   },
   tokens: [{
+    device: {
+      _id: {
+        type: String,
+        required: false,
+        default: serverId
+      },
+      type: {
+        type: String,
+        default: 'server'
+      }
+    },
     access: {
       type: String,
       required: true
@@ -51,28 +65,19 @@ UserSchema.methods.toJSON = function () {
   return _.pick(userObject, ['_id', 'name', 'email'])
 }
 
-UserSchema.methods.generateAuthToken = async function (access) {
+UserSchema.methods.generateAuthToken = async function (userAccess) {
   try {
+    console.log(userAccess)
+    const access = userAccess || 'user'
     const user = this
-    const token = await jwt.sing({_id: user._id.toHexString(), access}, key).toString()
-    user.tokens.push({access, token})
+    const token = await jwt.sign({_id: user._id.toHexString(), access}, key).toString()
+    console.log(token)
+    await user.tokens.push({token, access})
     await user.save()
 
-    return token
-  } catch (e) {
-    return e
-  }
-}
-
-UserSchema.statics.returnByToken = async function (token) {
-  try {
-    const User = this
-    const decoded = await jwt.verify(token, key)
-    const user = await User.findOne({ '_id': decoded._id, 'tokens.token': token })
-
-    return user
+    return { token }
   } catch (error) {
-    return { err: 'Ocorreu um erro ao buscar o usuário', error }
+    return { error }
   }
 }
 
@@ -86,8 +91,8 @@ UserSchema.statics.findByToken = async function (token) {
     })
 
     return user
-  } catch (e) {
-    return e
+  } catch (error) {
+    return { error }
   }
 }
 
@@ -101,8 +106,8 @@ UserSchema.statics.findByCredentials = async function (email, password) {
     }
 
     return user
-  } catch (e) {
-    return {err: 'Usuário ou senha incorretos', e}
+  } catch (error) {
+    return {message: 'Usuário ou senha incorretos', error}
   }
 }
 
@@ -110,8 +115,21 @@ UserSchema.methods.removeToken = async function (token) {
   try {
     const User = this
     return User.update({ $pull: {tokens: { token }} })
-  } catch (e) {
-    return { err: 'Ocorreu um erro', e }
+  } catch (error) {
+    return { message: 'Ocorreu um erro', error }
+  }
+}
+
+UserSchema.methods.login = async function (user) {
+  try {
+    const token = user.tokens.token
+    if (token) {
+      return { message: 'Usuário já possui sessão ativa em outro lugar' }
+    }
+    const newToken = user.generateAuthToken(user.access)
+    return newToken
+  } catch (error) {
+    return { error }
   }
 }
 

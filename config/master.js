@@ -4,5 +4,8 @@ module.exports = {
   },
   network: {
     port: process.env.PORT || 3000
+  },
+  app: {
+    key: process.env.APP_KEY || 'reallyLongKeyHere'
   }
 }
