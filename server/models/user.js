@@ -67,11 +67,9 @@ UserSchema.methods.toJSON = function () {
 
 UserSchema.methods.generateAuthToken = async function (userAccess) {
   try {
-    console.log(userAccess)
     const access = userAccess || 'user'
     const user = this
     const token = await jwt.sign({_id: user._id.toHexString(), access}, key).toString()
-    console.log(token)
     await user.tokens.push({token, access})
     await user.save()
 

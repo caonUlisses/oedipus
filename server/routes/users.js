@@ -24,7 +24,6 @@ oedipus.get('/', authenticate, async (req, res) => {
 oedipus.post('/', async (req, res) => {
   try {
     let body = _.pick(req.body, ['name', 'email', 'password', 'access'])
-    console.log(body.access)
     body.picture = picture.preparePicture(req)
     const user = await new User(body)
     await user.save()
