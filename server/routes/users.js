@@ -5,22 +5,8 @@ const oedipus = express.Router()
 const { Mongoose } = require('./../db/mongoose.js')
 
 const { authenticate } = require('./../middleware/authenticate.js')
-const { admin } = require('./../middleware/admin.js')
 const { picture } = require('./../utils/picture.js')
 const {User} = require('./../models/user.js')
-
-oedipus.get('/admin', admin, async(req, res) => {
-  try {
-    const users = await User.find()
-
-    if (!users) {
-      throw new error({ message: 'Houve um erro na página' })
-    }
-    res.status(200).send(users)
-  } catch (error) {
-    res.status(401).send({message: 'Recurso disponível apenas para administradores', error})
-  }
-})
 
 oedipus.get('/', authenticate, async (req, res) => {
   try {
@@ -114,12 +100,8 @@ oedipus.delete('/:_id', authenticate, async (req, res) => {
 oedipus.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
-    const user = await User.findByCredentials(email, password)
-    const payload = {
-      user: user,
-      tokens: user.tokens
-    }
-    res.status(200).send(payload)
+    const token = await User.login(email, password)
+    res.status(200).send(token)
   } catch (error) {
     res.status(401).send({ message: 'Usuário ou senha incorreto', error })
   }

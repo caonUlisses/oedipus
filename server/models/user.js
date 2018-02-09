@@ -73,7 +73,7 @@ UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
 
     return { token }
   } catch (error) {
-    return { error }
+    return { message: 'Houve um erro gerando o token de login', error }
   }
 }
 
@@ -116,16 +116,18 @@ UserSchema.methods.removeToken = async function (token) {
   }
 }
 
-UserSchema.methods.login = async function (user) {
+UserSchema.statics.login = async function (email, password) {
   try {
-    const token = user.tokens.token
-    if (token) {
-      return { message: 'Usuário já possui sessão ativa em outro lugar' }
+    const user = await this.findByCredentials(email, password)
+
+    if (!user) {
+      return { message: 'Usuário ou senha incorretos' }
     }
-    const newToken = user.generateAuthToken(user.access)
-    return newToken
+
+    const token = await user.generateAuthToken()
+    return token
   } catch (error) {
-    return { error }
+    return { message: 'Houve um erro', error }
   }
 }
 
