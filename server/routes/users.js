@@ -5,8 +5,22 @@ const oedipus = express.Router()
 const { Mongoose } = require('./../db/mongoose.js')
 
 const { authenticate } = require('./../middleware/authenticate.js')
+const { admin } = require('./../middleware/admin.js')
 const { picture } = require('./../utils/picture.js')
 const {User} = require('./../models/user.js')
+
+oedipus.get('/admin', admin, async(req, res) => {
+  try {
+    const users = await User.find()
+
+    if (!users) {
+      throw new error({ message: 'Houve um erro na página' })
+    }
+    res.status(200).send(users)
+  } catch (e) {
+    res.status(401).send({message: 'Recurso disponível apenas para administradores'})
+  }
+})
 
 oedipus.get('/', authenticate, async (req, res) => {
   try {

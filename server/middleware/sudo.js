@@ -13,7 +13,7 @@ const sudo = async (req, res, next) => {
       return res.status(400).send({message: 'Usuário não encontrado'})
     }
 
-    if (user.tokens.access !== 'sudo') {
+    if (user.tokens.filter(token => token.access !== 'sudo').length > 0) {
       return res.status(401).send({message: 'Você não tem permissão para acessar este recurso'})
     }
 

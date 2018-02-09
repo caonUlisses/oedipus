@@ -1,32 +1,31 @@
 require('dotenv').config()
 
-const _ = require('lodash')
 const cors = require('cors')
 const logger = require('morgan')
 const express = require('express')
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 
-const { userRouter } = require('./server/routes/users.js')
+const { oedipus } = require('./server/routes/users.js')
 const { authenticate } = require('./server/middleware/authenticate.js')
 
-const oedipus = express()
+const app = express()
 
-oedipus.use(cors())
-oedipus.use(bodyParser.json())
-oedipus.use(bodyParser.urlencoded({ extended: false }))
-oedipus.use(fileUpload())
-oedipus.use(logger('dev'))
+app.use(cors())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(fileUpload())
+app.use(logger('dev'))
 
-oedipus.use('/', userRouter)
+app.use('/', oedipus)
 
-oedipus.use((req, res, next) => {
-  const err = new Error('Página não encontrada')
+app.use((req, res, next) => {
+  const err = new Error({ message: 'Página não encontrada' })
   err.status = 404
-  next(err)
+  res.status(404).send(err)
 })
 
-oedipus.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
   res.locals.message = err.message
   res.locals.error = req.oedipus.get('env') === err
 
@@ -34,8 +33,8 @@ oedipus.use((err, req, res, next) => {
   res.send(err)
 })
 
-oedipus.listen(3000, () => {
+app.listen(3000, () => {
   console.log('running on 3000')
 })
 
-module.exports = { oedipus, authenticate }
+module.exports = { app, authenticate }
