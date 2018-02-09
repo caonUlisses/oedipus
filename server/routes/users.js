@@ -6,7 +6,7 @@ const { Mongoose } = require('./../db/mongoose.js')
 
 const { authenticate } = require('./../middleware/authenticate.js')
 const { picture } = require('./../utils/picture.js')
-const {User} = require('./../models/user.js')
+const { User } = require('./../models/user.js')
 
 oedipus.get('/', authenticate, async (req, res) => {
   try {
@@ -107,4 +107,4 @@ oedipus.post('/login', async (req, res) => {
   }
 })
 
-module.exports = {oedipus}
+module.exports = { oedipus }
