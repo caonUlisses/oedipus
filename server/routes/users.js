@@ -17,8 +17,8 @@ oedipus.get('/admin', admin, async(req, res) => {
       throw new error({ message: 'Houve um erro na página' })
     }
     res.status(200).send(users)
-  } catch (e) {
-    res.status(401).send({message: 'Recurso disponível apenas para administradores'})
+  } catch (error) {
+    res.status(401).send({message: 'Recurso disponível apenas para administradores', error})
   }
 })
 
@@ -41,7 +41,7 @@ oedipus.post('/', async (req, res) => {
     body.picture = picture.preparePicture(req)
     const user = await new User(body)
     await user.save()
-    const token = await user.generateAuthToken(body.access)
+    const token = await user.generateAuthToken()
     res.header('x-auth', token).status(200).send({ message: 'Usuário criado com sucesso' })
   } catch (error) {
     res.status(400).send({ message: 'Houve um erro na criação do usuário', error })

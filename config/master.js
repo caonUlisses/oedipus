@@ -6,6 +6,10 @@ module.exports = {
     port: process.env.PORT || 3000
   },
   app: {
-    key: process.env.APP_KEY || 'reallyLongKeyHere'
+    name: process.env.APP_NAME || 'app_name',
+    key: process.env.APP_KEY || 'reallyLongKeyHere',
+    users: {
+      default_access: process.env.DEFAULT_USER_ACCESS || 'user'
+    }
   }
 }

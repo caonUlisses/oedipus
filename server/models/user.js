@@ -19,6 +19,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     minlength: 1
   },
+  access: {
+    type: String,
+    required: true,
+    default: config.app.users.default_access
+  },
   email: {
     type: String,
     required: true,
@@ -41,15 +46,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
         default: serverId
-      },
-      type: {
-        type: String,
-        default: 'server'
       }
-    },
-    access: {
-      type: String,
-      required: true
     },
     token: {
       type: String,
@@ -65,11 +62,12 @@ UserSchema.methods.toJSON = function () {
   return _.pick(userObject, ['_id', 'name', 'email'])
 }
 
-UserSchema.methods.generateAuthToken = async function (userAccess) {
+UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
   try {
-    const access = userAccess || 'user'
     const user = this
-    const token = await jwt.sign({_id: user._id.toHexString(), access}, key).toString()
+    const { name, access } = user
+    const expiration = Date.now() + 2000000000
+    const token = await jwt.sign({_id: user._id.toHexString(), access, expiration, name, issuer}, key).toString()
     await user.tokens.push({token, access})
     await user.save()
 
