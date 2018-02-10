@@ -13,7 +13,7 @@ oedipus.get('/', authenticate, async (req, res) => {
     const users = await User.find()
 
     if (!users) {
-      throw new error({ message: 'Houve um erro na página' })
+      throw new Error({ message: 'Houve um erro na página' })
     }
     res.status(200).send(users)
   } catch (error) {

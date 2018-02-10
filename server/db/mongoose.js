@@ -5,4 +5,4 @@ mongoose.Promise = global.Promise
 
 mongoose.connect(config.db.url || 'mongodb://mongo:27017/auth')
 
-module.exports = {mongoose}
+module.exports = { mongoose }
