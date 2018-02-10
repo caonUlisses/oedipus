@@ -3,6 +3,8 @@ let config = require('./../../config/master')
 
 mongoose.Promise = global.Promise
 
-mongoose.connect(config.db.url || 'mongodb://mongo:27017/auth')
+const connect = () => {
+  mongoose.connect(config.db.url || 'mongodb://mongo:27017/auth')
+}
 
-module.exports = { mongoose }
+module.exports = { connect }

@@ -1,12 +1,14 @@
+require('./../db/mongoose.js').connect()
+
 const _ = require('lodash')
 const express = require('express')
 const oedipus = express.Router()
 
-const { Mongoose } = require('./../db/mongoose.js')
-
 const { authenticate } = require('./../middleware/authenticate.js')
 const { picture } = require('./../utils/picture.js')
 const { User } = require('./../models/user.js')
+
+// TODO: use passportJS to authenticate users through Social Login
 
 oedipus.get('/', authenticate, async (req, res) => {
   try {
