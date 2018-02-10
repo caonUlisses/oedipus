@@ -66,7 +66,7 @@ UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
   try {
     const user = this
     const { name, access } = user
-    const expiration = Date.now() - 2000000000
+    const expiration = Date.now() + 2000000000
     const token = await jwt.sign({ _id: user._id.toHexString(), access, expiration, name, issuer }, key).toString()
     await user.tokens.push({ token, access })
     await user.save()
