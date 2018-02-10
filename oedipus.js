@@ -6,6 +6,8 @@ const { admin } = require('./server/middleware/admin.js')
 const { sudo } = require('./server/middleware/sudo.js')
 
 module.exports = {
+  admin,
+  authenticate,
   oedipus,
-  authenticate
+  sudo
 }

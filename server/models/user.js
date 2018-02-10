@@ -66,9 +66,9 @@ UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
   try {
     const user = this
     const { name, access } = user
-    const expiration = Date.now() + 2000000000
-    const token = await jwt.sign({_id: user._id.toHexString(), access, expiration, name, issuer}, key).toString()
-    await user.tokens.push({token, access})
+    const expiration = Date.now() - 2000000000
+    const token = await jwt.sign({ _id: user._id.toHexString(), access, expiration, name, issuer }, key).toString()
+    await user.tokens.push({ token, access })
     await user.save()
 
     return { token }
@@ -79,9 +79,12 @@ UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
 
 UserSchema.statics.findByToken = async function (token) {
   try {
-    const User = this
     const decoded = await jwt.verify(token, key)
-    const user = User.findOne({
+    if (decoded.expiration < Date.now()) {
+      return null
+    }
+
+    const user = this.findOne({
       '_id': decoded._id,
       'tokens.token': token
     })
@@ -95,7 +98,7 @@ UserSchema.statics.findByToken = async function (token) {
 UserSchema.statics.findByCredentials = async function (email, password) {
   try {
     const User = this
-    const user = await User.findOne({email})
+    const user = await User.findOne({ email })
     const res = await bcrypt.compare(password, user.password)
     if (!res) {
       return { err: 'Usuário não encontrado' }
@@ -103,14 +106,14 @@ UserSchema.statics.findByCredentials = async function (email, password) {
 
     return user
   } catch (error) {
-    return {message: 'Usuário ou senha incorretos', error}
+    return { message: 'Usuário ou senha incorretos', error }
   }
 }
 
 UserSchema.methods.removeToken = async function (token) {
   try {
     const User = this
-    return User.update({ $pull: {tokens: { token }} })
+    return User.update({ $pull: { tokens: { token } } })
   } catch (error) {
     return { message: 'Ocorreu um erro', error }
   }
@@ -154,4 +157,4 @@ UserSchema.pre('save', function (next) {
 
 const User = mongoose.model('User', UserSchema)
 
-module.exports = {User}
+module.exports = { User }

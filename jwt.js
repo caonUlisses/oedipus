@@ -1,5 +1,0 @@
-const jwt = require('jsonwebtoken')
-
-const decoded = jwt.decode('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YTdkZjFkNWExMTkwODE4NjEwN2MzYTciLCJhY2Nlc3MiOiJhZG1pbiIsImV4cGlyYXRpb24iOjE1MjAyMDMzNDk5ODcsIm5hbWUiOiJqb3RhIHF1ZXN0IiwiaXNzdWVyIjoiZm9yY2UiLCJpYXQiOjE1MTgyMDMzNDl9.oRUj4USGqRn60ofl6eLjZhNleWGGeNYhgEXY92bVhwI').expiration
-
-console.log(decoded)

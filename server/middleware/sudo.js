@@ -6,21 +6,21 @@ const sudo = async (req, res, next) => {
     const user = await User.findByToken(token)
 
     if (!token) {
-      return res.status(401).send({message: 'Faça login primeiro'})
+      return res.status(401).send({ message: 'Faça login primeiro' })
     }
 
     if (!user) {
-      return res.status(400).send({message: 'Usuário não encontrado'})
+      return res.status(400).send({ message: 'Faça login novamente' })
     }
 
-    if (user.tokens.filter(token => token.access !== 'sudo').length > 0) {
-      return res.status(401).send({message: 'Você não tem permissão para acessar este recurso'})
+    if (user.access !== 'sudo') {
+      return res.status(401).send({ message: 'Você não tem permissão para acessar este recurso' })
     }
 
     req.token = token
     next()
   } catch (error) {
-    res.status(401).send({message: 'Usuário não encontrado'})
+    res.status(401).send({ message: 'Usuário não encontrado' })
   }
 }
 

@@ -5,22 +5,23 @@ const admin = async (req, res, next) => {
     const token = req.header('x-auth')
     const user = await User.findByToken(token)
 
+    console.log(user)
     if (!token) {
-      return res.status(401).send({message: 'Faça login primeiro'})
+      return res.status(401).send({ message: 'Faça login primeiro' })
     }
 
     if (!user) {
-      return res.status(400).send({message: 'Usuário não encontrado'})
+      return res.status(400).send({ message: 'Faça login novamente' })
     }
 
-    if (user.tokens.filter(token => token.access !== 'admin').length > 0) {
-      return res.status(401).send({message: 'Você não tem permissão para acessar este recurso'})
+    if (user.access !== 'admin') {
+      return res.status(401).send({ message: 'Você não tem permissão para acessar este recurso' })
     }
 
     req.token = token
     next()
   } catch (error) {
-    res.status(401).send({message: 'Usuário não encontrado', error})
+    res.status(401).send({ message: 'Usuário não encontrado', error })
   }
 }
 

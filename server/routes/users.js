@@ -7,8 +7,11 @@ const oedipus = express.Router()
 const { authenticate } = require('./../middleware/authenticate.js')
 const { picture } = require('./../utils/picture.js')
 const { User } = require('./../models/user.js')
+const { admin } = require('./../middleware/admin')
 
 // TODO: use passportJS to authenticate users through Social Login
+
+oedipus.get('/admin/', admin, (req, res) => res.send('oi'))
 
 oedipus.get('/', authenticate, async (req, res) => {
   try {
