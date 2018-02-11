@@ -7,7 +7,7 @@ const validator = require('validator')
 const config = require('./../../config/master.js')
 const SHA256 = require('crypto-js/sha256')
 
-const key = config.app.key
+const key = config.app.users.key
 
 const serverId = new ObjectID()
 
