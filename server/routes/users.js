@@ -9,8 +9,6 @@ const { picture } = require('./../utils/picture.js')
 const { User } = require('./../models/user.js')
 const { admin } = require('./../middleware/admin')
 
-// TODO: use passportJS to authenticate users through Social Login
-
 oedipus.get('/admin/', admin, (req, res) => res.send('oi'))
 
 oedipus.get('/', authenticate, async (req, res) => {
@@ -29,7 +27,8 @@ oedipus.get('/', authenticate, async (req, res) => {
 oedipus.post('/', async (req, res) => {
   try {
     let body = _.pick(req.body, ['name', 'email', 'password', 'access'])
-    body.picture = picture.preparePicture(req)
+    body.picture = picture.storePicture(req)
+    console.log(body.picture)
     const user = await new User(body)
     await user.save()
     const token = await user.generateAuthToken()
@@ -77,7 +76,7 @@ oedipus.patch('/:_id', authenticate, async (req, res) => {
   try {
     const _id = req.params._id
     const body = _.pick(req.body, ['name', 'email', 'password'])
-    body.picture = picture.preparePicture(req)
+    body.picture = picture.storePicture(req)
     const user = await User.findOneAndUpdate({ _id }, { $set: body }, { new: true })
     const token = req.token
     const userToken = user.tokens[0].token

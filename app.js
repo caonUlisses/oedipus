@@ -1,3 +1,5 @@
+'use strict'
+
 require('dotenv').config()
 
 const cors = require('cors')
@@ -8,6 +10,9 @@ const fileUpload = require('express-fileupload')
 
 const { oedipus } = require('./server/routes/users.js')
 const { authenticate } = require('./server/middleware/authenticate.js')
+
+const config = require('./config/master')
+const port = config.network.port
 
 const app = express()
 
@@ -33,8 +38,8 @@ app.use((err, req, res, next) => {
   res.send(err)
 })
 
-app.listen(3000, () => {
-  console.log('running on 3000')
+app.listen(port, () => {
+  console.log('running', port)
 })
 
 module.exports = { app, authenticate }

@@ -1,10 +1,12 @@
+const SHA256 = require('crypto-js/sha256')
+
 const picture = {
 
-  preparePicture: (req) => {
+  storePicture: (req) => {
     const hash = Math.random().toString(36).substring(7)
     const picture = req.files ? req.files.picture : null
 
-    const pictureName = picture ? hash + picture.name : 'default.png'
+    const pictureName = picture ? SHA256(hash, picture.name) + picture.name : 'default.png'
     const picturePath = `./files/${pictureName}`
 
     if (picture) {
@@ -19,6 +21,4 @@ const picture = {
   }
 }
 
-module.exports = {
-  picture
-}
+module.exports = { picture }

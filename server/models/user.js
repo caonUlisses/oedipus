@@ -8,7 +8,6 @@ const config = require('./../../config/master.js')
 const SHA256 = require('crypto-js/sha256')
 
 const key = config.app.key
-const vKey = config.app.validation.key
 
 const serverId = new ObjectID()
 
@@ -71,7 +70,7 @@ UserSchema.methods.toJSON = function () {
   const user = this
   const userObject = user.toObject()
 
-  return _.pick(userObject, ['_id', 'name', 'email'])
+  return _.pick(userObject, ['_id', 'name', 'email', 'picture'])
 }
 
 UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
