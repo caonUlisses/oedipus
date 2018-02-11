@@ -10,6 +10,9 @@ module.exports = {
     key: process.env.APP_KEY || 'reallyLongKeyHere',
     users: {
       default_access: process.env.DEFAULT_USER_ACCESS || 'user'
+    },
+    validation: {
+      key: process.env.VALIDATION_KEY || 'realyLongString'
     }
   }
 }

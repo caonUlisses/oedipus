@@ -5,8 +5,11 @@ const mongoose = require('mongoose')
 const ObjectID = require('mongodb').ObjectID
 const validator = require('validator')
 const config = require('./../../config/master.js')
+const SHA256 = require('crypto-js/sha256')
 
 const key = config.app.key
+const vKey = config.app.validation.key
+
 const serverId = new ObjectID()
 
 const UserSchema = new mongoose.Schema({
@@ -24,6 +27,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: config.app.users.default_access
   },
+  verified: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   email: {
     type: String,
     required: true,
@@ -39,6 +47,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 6
+  },
+  validation_key: {
+    type: String,
+    required: false
   },
   tokens: [{
     device: {
@@ -134,25 +146,28 @@ UserSchema.statics.login = async function (email, password) {
   }
 }
 
-UserSchema.pre('save', function (next) {
-  const user = this
-
+UserSchema.methods.preparePassword = function (user, next) {
   if (user.isModified('password')) {
-    bcrypt.genSalt(10, (err, salt) => {
-      if (err) {
-        return err
-      }
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        if (err) {
-          return err
-        }
+    bcrypt.genSalt(10, (error, salt) => {
+      if (error) { return error }
+      bcrypt.hash(user.password, salt, (error, hash) => {
+        if (error) { return error }
         user.password = hash
         next()
       })
     })
-  } else {
-    next()
-  }
+  } else { next() }
+}
+
+UserSchema.methods.prepareValidationCode = function (user, next) {
+  user.validation_key = SHA256(user.email).toString()
+}
+
+UserSchema.pre('save', function (next) {
+  const user = this
+
+  this.preparePassword(user, next)
+  this.prepareValidationCode(user, next)
 })
 
 const User = mongoose.model('User', UserSchema)
