@@ -15,10 +15,11 @@ const picture = {
 
       if (picture) {
         // TODO: set picture maximun size
-        await picture.mv(`./files/${pictureName}`, (err) => (err))
+        await picture.mv(picturePath, (err) => (err))
         const thumb = await jimp.read(picturePath)
         await thumb.resize(25, 25)
-        await thumb.write(`./files/thumb_${pictureName}`)
+        await thumb.write(`${fileServer}/thumb_${pictureName}`)
+        if (!thumb) { throw new Error({message: 'Houve um erro adaptando a imagem'}) }
       }
 
       return picturePath
