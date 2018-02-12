@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const pick = require('lodash/pick')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const validator = require('validator')
@@ -38,6 +38,12 @@ const ClientSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+  owns: [
+    {
+      type: String,
+      required: false
+    }
+  ],
   tokens: [{
     token: {
       type: String,
@@ -50,7 +56,7 @@ ClientSchema.methods.toJSON = function () {
   const user = this
   const userObject = user.toObject()
 
-  return _.pick(userObject, ['_id', 'name', 'email', 'picture'])
+  return pick(userObject, ['_id', 'name', 'email', 'picture'])
 }
 
 ClientSchema.methods.generateAuthToken = async function (issuer = 'server') {

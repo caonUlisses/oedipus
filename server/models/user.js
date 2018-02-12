@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const pick = require('lodash/pick')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose')
@@ -30,6 +30,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
     default: false
+  },
+  active: {
+    type: Boolean,
+    default: true
   },
   email: {
     type: String,
@@ -70,7 +74,7 @@ UserSchema.methods.toJSON = function () {
   const user = this
   const userObject = user.toObject()
 
-  return _.pick(userObject, ['_id', 'name', 'email', 'picture'])
+  return pick(userObject, ['_id', 'name', 'email', 'picture'])
 }
 
 UserSchema.methods.generateAuthToken = async function (issuer = 'force') {
