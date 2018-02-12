@@ -5,6 +5,9 @@ module.exports = {
   network: {
     port: process.env.PORT || 3000
   },
+  files: {
+    server: process.env.FILE_SERVER || './files'
+  },
   app: {
     name: process.env.APP_NAME || 'oedipus',
     users: {

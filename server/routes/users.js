@@ -4,6 +4,8 @@ const _ = require('lodash')
 const express = require('express')
 const oedipus = express.Router()
 
+// TODO: set up password recovery routes
+
 const { authenticate } = require('./../middleware/authenticate.js')
 const { picture } = require('./../utils/picture.js')
 const { User } = require('./../models/user.js')
