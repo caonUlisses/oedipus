@@ -1,6 +1,6 @@
 require('./../db/mongoose.js').connect()
 
-const _ = require('lodash')
+const pick = require('lodash/pick')
 const express = require('express')
 const oedipus = express.Router()
 
@@ -10,6 +10,8 @@ const { authenticate } = require('./../middleware/authenticate.js')
 const { picture } = require('./../utils/picture.js')
 const { User } = require('./../models/user.js')
 const { admin } = require('./../middleware/admin')
+
+const config = require('./../../config/master')
 
 oedipus.get('/admin/', admin, (req, res) => res.send('oi'))
 
@@ -28,10 +30,14 @@ oedipus.get('/', authenticate, async (req, res) => {
 
 oedipus.post('/', async (req, res) => {
   try {
-    let body = _.pick(req.body, ['name', 'email', 'password', 'access'])
-    body.picture = await picture.storePicture(req)
-    const user = await new User(body)
-    await user.save()
+    let body = pick(req.body, ['name', 'email', 'password', 'access'])
+    if (!req.files.picture) {
+      body.picture = `${config.files.server}/default.png`
+    } else {
+      const pic = await picture.store(req.files.picture)
+      picture.prepare(pic)
+    }
+    const user = await new User(body).save()
     const token = await user.generateAuthToken()
     res.header('x-auth', token).status(200).send({ message: 'Usuário criado com sucesso' })
   } catch (error) {
@@ -76,8 +82,13 @@ oedipus.get('/:_id', authenticate, async (req, res) => {
 oedipus.patch('/:_id', authenticate, async (req, res) => {
   try {
     const _id = req.params._id
-    const body = _.pick(req.body, ['name', 'email', 'password'])
-    body.picture = picture.storePicture(req)
+    const body = pick(req.body, ['name', 'email', 'password', 'access'])
+    if (!req.files.picture) {
+      body.picture = `${config.files.server}/default.png`
+    } else {
+      const pic = await picture.store(req.files.picture)
+      picture.prepare(pic)
+    }
     const user = await User.findOneAndUpdate({ _id }, { $set: body }, { new: true })
     const token = req.token
     const userToken = user.tokens[0].token

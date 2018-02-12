@@ -1,29 +1,39 @@
+const sharp = require('sharp')
 const SHA256 = require('crypto-js/sha256')
-const jimp = require('jimp')
-
 const config = require('./../../config/master')
 const fileServer = config.files.server
 
 const picture = {
-
-  storePicture: async (req) => {
+  name: null,
+  store: async (file) => {
     try {
-      const hash = Math.random(26).toString().substring(7)
-      const picture = req.files ? req.files.picture : null
-      const pictureName = picture ? SHA256(hash) + picture.name : 'default.png'
-      const picturePath = `${fileServer}/${pictureName}`
+      const name = await picture.setName(file.name)
+      await file.mv(`${fileServer}/${name}`)
+      this.name = name
+      return `${fileServer}/${name}`
+    } catch (error) {
+      throw new Error(error)
+    }
+  },
+  prepare: async (file) => {
+    try {
+      const resize = await sharp(file)
+      await resize.resize(400, 400)
+      await resize.toFile(`${fileServer}/400x400_${this.name}`)
+      await resize.resize(25, 25)
+      await resize.toFile(`${fileServer}/thumbnails/thumb_${this.name}`)
+    } catch (error) {
+      throw new Error(error)
+    }
+  },
 
-      if (picture) {
-        // TODO: set picture maximun size
-        await picture.mv(picturePath, (err) => (err))
-        const thumb = await jimp.read(picturePath)
-        await thumb.resize(25, 25)
-        await thumb.write(`${fileServer}/thumb_${pictureName}`)
-        if (!thumb) { throw new Error({message: 'Houve um erro adaptando a imagem'}) }
-      }
-
-      return picturePath
-    } catch (error) { return error }
+  setName: async (fileName) => {
+    try {
+      const hash = SHA256(Math.random(36).toString().substring(7))
+      return hash + fileName
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 }
 
