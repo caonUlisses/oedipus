@@ -27,8 +27,7 @@ oedipus.get('/', authenticate, async (req, res) => {
 oedipus.post('/', async (req, res) => {
   try {
     let body = _.pick(req.body, ['name', 'email', 'password', 'access'])
-    body.picture = picture.storePicture(req)
-    console.log(body.picture)
+    body.picture = await picture.storePicture(req)
     const user = await new User(body)
     await user.save()
     const token = await user.generateAuthToken()
